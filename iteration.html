@@ -24,7 +24,7 @@
             position:relative;
             z-index:20;
         }
-        
+
         </style>
 </head>
 <body>
@@ -45,6 +45,7 @@
 
       //  createAnnotateStage();
     })
+
 
     function createLayout() {
         var aHTML = [];
@@ -91,10 +92,10 @@
                     var imageObj = new Image();
                     imageObj.onload = function() {
 
-
+                        $("#coverCanvas").remove(); // replace the canvas if it exists ...
                         // Get a reference to the canvas object
                         //var canvas = $('#myCanvas')[0];
-                        var canvas = $('<canvas>')
+                        var canvas = $("<canvas id='coverCanvas'>")
                             .attr({
                                 width: imageObj.width,
                                 height: imageObj.height
