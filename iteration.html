@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="js/jquery-1.9.1.min.js"></script>
+    <script src="js/RequestAnimationFrame.js"></script>
     <script src="js/ImageResizer.js"></script>
+    <script src="js/lineDrawing.js"></script>
     <style>
 
         .outsideWrapper{
@@ -35,10 +37,12 @@
 
 <script>
 
+    var lineDrawing = new LineDrawing({strokeStyle: "#de0a3e",lineWidth: 5});
+
     $(function() {
         createLayout();
         bindEvents();
-    })
+    });
 
 
     function createLayout() {
@@ -67,7 +71,7 @@
         $('body').html(aHTML.join(''));
     }
 
-    function doTheMagic(dataURL) {
+    function drawCoverCanvas(dataURL) {
 
         var imageObj = new Image();
         imageObj.onload = function() {
@@ -85,7 +89,8 @@
 
             $('#insideWrapper').append(canvas);
 
-        }
+            lineDrawing.attachToCanvas(canvas.get(0));
+        };
         imageObj.src = dataURL;
     }
 
@@ -106,10 +111,36 @@
                     //timeout: 5000,
                     debug : true
                 });
-                resizer.handleFileSelection(f, doTheMagic);
+                resizer.handleFileSelection(f, drawCoverCanvas);
             }
         });
     }
+
+    $('body').on("click", "#combineButton", function(event) {
+
+        $("#combineCanvas").remove(); // replace the canvas if it exists ...
+
+        var imageObj = new Image();
+        imageObj.onload = function () {
+            var canvas = $("<canvas id='combineCanvas'>").attr({
+                width: imageObj.width,
+                height: imageObj.height
+            })[0];
+            var context = canvas.getContext("2d");
+
+            context.drawImage(imageObj, 0, 0);
+
+            var coverCanvas = $("#coverCanvas")[0];
+
+            context.drawImage(coverCanvas, 0, 0);
+
+
+            $('#myAnnotationResult').append(canvas);
+        };
+        imageObj.src = $('#loadedImage')[0].src;
+    });
+
+
 
 </script>
 
