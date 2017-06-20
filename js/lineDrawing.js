@@ -38,11 +38,13 @@ LineDrawing.prototype.attachToCanvas = function(canvas) {
         This.drawing = true;
         This.lastPos = This.getMousePos(e);
         This.mousePos = This.lastPos;
+        This.canvasContext.beginPath();
     }, false);
 
     canvas.addEventListener("mouseup", function (e) {
         e.preventDefault();
         This.drawing = false;
+        This.canvasContext.closePath();
     }, false);
 
     canvas.addEventListener("mousemove", function (e) {
@@ -133,4 +135,19 @@ LineDrawing.prototype.getCanvasPosition = function() {
         y: yPosition
     };
 };
+
+LineDrawing.prototype.setColor = function(colour) {
+    this.config.strokeStyle = colour;
+    this.canvasContext.strokeStyle = this.config.strokeStyle;
+};
+
+LineDrawing.prototype.setLineWidth = function(lineWidth) {
+    this.config.lineWidth = lineWidth;
+    this.canvasContext.lineWidth = this.config.lineWidth;
+};
+
+LineDrawing.prototype.clearCanvas = function() {
+    this.canvasContext.clearRect(0,0,this.canvas.width,this.canvas.height);
+};
+
 
