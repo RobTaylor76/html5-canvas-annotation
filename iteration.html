@@ -16,7 +16,7 @@
 
             position:relative;
         }
-        .coveredImage{
+        #coveredCanvas{
 
             position:absolute;
             top:0px;
@@ -58,7 +58,7 @@
             '</div>' +
             '<div class="outsideWrapper">' +
             '<div class="insideWrapper" id ="insideWrapper">' +
-            '<img id="loadedImage" class="coveredImage">' +
+     //       '<img id="loadedImage" class="coveredImage">' +
             '</div>' +
             '</div>' +
 
@@ -97,31 +97,56 @@
 
     }
 
-    function drawCoverCanvas(dataURL) {
 
-        var imageObj = new Image();
-        imageObj.onload = function() {
+    function drawCanvases(canvas) {
+//'<img id="loadedImage" class="coveredImage">' +
+        canvas.id = "coveredCanvas";
+       // canvas.class = "coveredImage";
 
-            $('#loadedImage').attr('src', dataURL);
+        $('#insideWrapper').append(canvas);
 
-            $("#coverCanvas").remove(); // replace the canvas if it exists ...
-            $('#combineCanvas').remove();
+        $("#coverCanvas").remove(); // replace the canvas if it exists ...
+        $('#combineCanvas').remove();
 
-            var canvas = $("<canvas id='coverCanvas'>")
-                .attr({
-                    width: imageObj.width,
-                    height: imageObj.height
-                })
-                .addClass('coveringCanvas');
+        var coverCanvas = $("<canvas id='coverCanvas'>")
+            .attr({
+                width: canvas.width,
+                height: canvas.height
+            })
+            .addClass('coveringCanvas');
 
-            $('#insideWrapper').append(canvas);
+        $('#insideWrapper').append(coverCanvas);
 
-            lineDrawing.attachToCanvas(canvas.get(0));
+        lineDrawing.attachToCanvas(coverCanvas.get(0));
 
-            $('#annotationDrawingTools').show();
-        };
-        imageObj.src = dataURL;
+        $('#annotationDrawingTools').show();
     }
+
+//    function drawCoverCanvas(dataURL) {
+//
+//        var imageObj = new Image();
+//        imageObj.onload = function() {
+//
+//            $('#loadedImage').attr('src', dataURL);
+//
+//            $("#coverCanvas").remove(); // replace the canvas if it exists ...
+//            $('#combineCanvas').remove();
+//
+//            var canvas = $("<canvas id='coverCanvas'>")
+//                .attr({
+//                    width: imageObj.width,
+//                    height: imageObj.height
+//                })
+//                .addClass('coveringCanvas');
+//
+//            $('#insideWrapper').append(canvas);
+//
+//            lineDrawing.attachToCanvas(canvas.get(0));
+//
+//            $('#annotationDrawingTools').show();
+//        };
+//        imageObj.src = dataURL;
+//    }
 
     function bindEvents() {
         $('body').on("change", "#takePictureInput", function(event){
@@ -134,13 +159,17 @@
             }
             else {
 
+                $("#combineCanvas").remove();
+                $("#coveredCanvas").remove();
+                $("#coverCanvas").remove();
+
                 var resizer = new ImageResizer({
                     maxWidth: 1024,
                     quality: 0.90,
                     //timeout: 5000,
                     debug : true
                 });
-                resizer.handleFileSelection(f, drawCoverCanvas);
+                resizer.handleFileSelection(f, drawCanvases);
             }
         });
     }
@@ -149,26 +178,23 @@
 
         $("#combineCanvas").remove(); // replace the canvas if it exists ...
 
-        var imageObj = new Image();
-        imageObj.onload = function () {
-            var canvas = $("<canvas id='combineCanvas'>").attr({
-                width: imageObj.width,
-                height: imageObj.height
-            })[0];
-            var context = canvas.getContext("2d");
+        var coveredCanvas = $("#coveredCanvas")[0];
 
-            context.drawImage(imageObj, 0, 0);
+        var canvas = $("<canvas id='combineCanvas'>").attr({
+            width: coveredCanvas.width,
+            height: coveredCanvas.height
+        })[0];
 
-            var coverCanvas = $("#coverCanvas")[0];
+        var context = canvas.getContext("2d");
 
-            context.drawImage(coverCanvas, 0, 0);
+        context.drawImage(coveredCanvas, 0, 0);
 
+        var coverCanvas = $("#coverCanvas")[0];
 
-            $('#myAnnotationResult').append(canvas);
+        context.drawImage(coverCanvas, 0, 0);
 
+        $('#myAnnotationResult').append(canvas);
 
-        };
-        imageObj.src = $('#loadedImage')[0].src;
     });
 
 

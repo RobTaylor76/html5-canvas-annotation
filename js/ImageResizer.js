@@ -56,7 +56,7 @@ ImageResizer.prototype.drawImage = function(context, img, x, y, width, height, d
 }
 
 /*
- Returns the image data of the rezized image
+ Returns the canvas containing the rezized image
  */
 ImageResizer.prototype.scaleImage = function(img, completionCallback, orientation) {
     var canvas = document.createElement('canvas');
@@ -139,11 +139,11 @@ ImageResizer.prototype.scaleImage = function(img, completionCallback, orientatio
         canvas = this.scaleCanvasWithAlgorithm(canvas, mWidth);
     }
 
-    var imageData = canvas.toDataURL('image/jpeg', this.config.quality);
-    if (typeof this.config.onScale === 'function')
-        this.config.onScale(imageData);
+  //  var imageData = canvas.toDataURL('image/jpeg', this.config.quality);
+ //   if (typeof this.config.onScale === 'function')
+ //       this.config.onScale(imageData);
 
-    completionCallback(imageData);
+    completionCallback(canvas);
 };
 
 ImageResizer.prototype.scaleCanvasWithAlgorithm = function(canvas, maxWidth) {
