@@ -5,8 +5,8 @@
     <title>Title</title>
     <script src="js/jquery-1.9.1.min.js"></script>
     <script src="js/RequestAnimationFrame.js"></script>
-    <script src="js/ImageResizer.js"></script>
-    <script src="js/lineDrawing.js"></script>
+    <script src="js/ImageResizer.js?id=2"></script>
+    <script src="js/lineDrawing.js?id=2"></script>
     <style>
 
         .outsideWrapper{
@@ -52,7 +52,10 @@
             '<input accept="image/*" id="takePictureInput" type="file" />' +
             '</div>' +
             '<h2>Annotate on Image</h2>' +
-            '<div id="annotationDrawingTools"></div>' +
+            '<div id="annotationDrawingTools">' +
+            '<button id="clockwise">Rotate right</button>' +
+            '<button id="counterclockwise">Rotate left</button>' +
+            '</div>' +
             '<div id="imageContainer" >' +
             '<img id="yourImageSmall" alt="" />' +
             '</div>' +
@@ -64,7 +67,8 @@
 
             '<button id="combineButton">Combine</button>' +
             '<h2>Final Image</h2>' +
-            '<div id="myAnnotationResult"></div>');
+            '<div id="myAnnotationResult"></div>'
+        );
 
         $('body').html(aHTML.join(''));
 
@@ -94,19 +98,31 @@
             lineDrawing.clearCanvas();
         });
 
+        $("#clockwise").click(function(){
+ //           angleInDegrees+=90 % 360;
+            drawRotated(90);
+        });
 
+        $("#counterclockwise").click(function(){
+//            if(angleInDegrees == 0)
+//                angleInDegrees = 270;
+//            else
+//                angleInDegrees-=90 % 360;
+            drawRotated(270);
+        });
     }
 
 
     function drawCanvases(canvas) {
-//'<img id="loadedImage" class="coveredImage">' +
-        canvas.id = "coveredCanvas";
-       // canvas.class = "coveredImage";
 
-        $('#insideWrapper').append(canvas);
-
+        $("#coveredCanvas").remove(); // replace the canvas if it exists ...
         $("#coverCanvas").remove(); // replace the canvas if it exists ...
         $('#combineCanvas').remove();
+
+        //'<img id="loadedImage" class="coveredImage">' +
+        canvas.id = "coveredCanvas";
+
+        $('#insideWrapper').append(canvas);
 
         var coverCanvas = $("<canvas id='coverCanvas'>")
             .attr({
@@ -197,6 +213,37 @@
 
     });
 
+    function drawRotated(degrees){
+       // if(canvas) document.body.removeChild(canvas);
+
+        canvas = document.createElement("canvas");
+        var ctx=canvas.getContext("2d");
+
+
+        var coveredCanvas = $("#coveredCanvas")[0];
+
+
+        if(degrees == 90 || degrees == 270) {
+            canvas.width = coveredCanvas.height;
+            canvas.height = coveredCanvas.width;
+        } else {
+            canvas.width = coveredCanvas.width;
+            canvas.height = coveredCanvas.height;
+        }
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        if(degrees == 90 || degrees == 270) {
+            ctx.translate(coveredCanvas.height/2,coveredCanvas.width/2);
+        } else {
+            ctx.translate(coveredCanvas.width/2,coveredCanvas.height/2);
+        }
+        ctx.rotate(degrees*Math.PI/180);
+        ctx.drawImage(coveredCanvas,-coveredCanvas.width/2,-coveredCanvas.height/2);
+
+        drawCanvases(canvas);
+
+       // document.body.appendChild(canvas);
+    }
 
 
 </script>
