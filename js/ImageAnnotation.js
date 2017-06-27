@@ -12,6 +12,11 @@
 var ImageAnnotation = function(config) {
     this.setConfig(config);
 
+    this.coveringCanvasId = this.elementGUID();
+    this.coveredCanvasId = this.elementGUID();
+    this.canvasWrapperDivId = this.elementGUID();
+    this.annotationDrawingToolsDivId = this.elementGUID();
+
     this.createElements();
 };
 
@@ -45,53 +50,60 @@ ImageAnnotation.prototype.createElements = function() {
     // image rotation
     var $container = $(this.config.imageAnnotationContainerId);
 
-    var $drawingToolsDiv = $("<div>", {id: "annotationDrawingTools"});
+    var $drawingToolsDiv = $("<div>", {id: this.annotationDrawingToolsDivId});
 
     $container.append($drawingToolsDiv);
-    $('#annotationDrawingTools').hide();
+    $('#'+this.annotationDrawingToolsDivId).hide();
 
-    var $rotClockwise = $("<button>", {id: "clockwise"}).text("Rotate Right");
-    var $rotCounterClockwise = $("<button>", {id: "counterclockwise"}).text("Rotate Left");
+    var $rotClockwise = $("<a>", {href: "#", "data-action":"rotateClockwise"}).text("Rotate Right");
+    var $rotCounterClockwise = $("<a>", {href: "#", "data-action":"rotateCounterClockwise"}).text("Rotate Left");
 
     $drawingToolsDiv.append($rotCounterClockwise);
     $drawingToolsDiv.append($rotClockwise);
 
-    $("#clockwise").click(function(){
+    $drawingToolsDiv.find("a[data-action='rotateClockwise']").click(function(event){
+        event.preventDefault();
         This.rotateCanvases(90);
     });
 
-    $("#counterclockwise").click(function(){
+    $drawingToolsDiv.find("a[data-action='rotateCounterClockwise']").click(function(event){
+        event.preventDefault();
         This.rotateCanvases(270);
     });
 
     $.each(['#000', '#fff', '#ffff00',"#de000e"], function() {
-        $drawingToolsDiv.append("<a href='#annotationdrawing' data-color='" + this + "' style='background: " + this + "; width: 20px; display:inline-block; text-decoration: none;'>&nbsp;</a> ");
+        $drawingToolsDiv.append("<a href='#' data-color='" + this + "' style='background: " + this + "; width: 20px; display:inline-block; text-decoration: none;'>&nbsp;</a> ");
 
     });
     $.each([1, 3, 5], function() {
-        $drawingToolsDiv.append("<a href='#annotationdrawing' data-size='" + this + "' style='font-weight: bold; background: #ccc; text-align: center; text-decoration: none;'>" + this + "</a> ");
+        $drawingToolsDiv.append("<a href='#' data-size='" + this + "' style='font-weight: bold; background: #ccc; text-align: center; text-decoration: none;'>" + this + "</a> ");
     });
 
     var This = this;
 
-    $('#annotationDrawingTools a[data-color]').on("click",  function(event) {
+    $drawingToolsDiv.find('a[data-color]').on("click",  function(event) {
+        event.preventDefault();
         var color = $(event.target).data('color');
         This.canvasLineDrawing.setColor(color);
     });
 
-    $('#annotationDrawingTools a[data-size]').on("click",  function(event) {
+
+    $drawingToolsDiv.find('a[data-size]').on("click",  function(event) {
+        event.preventDefault();
         var size = $(event.target).data('size');
         This.canvasLineDrawing.setLineWidth(size);
     });
 
-    $('#annotationDrawingTools').append("<a href='#annotationdrawing' id='resetCanvas'>Reset</a> ");
 
-    $("#resetCanvas").on("click",  function(event) {
+    $drawingToolsDiv.append($("<a>", {href: "#", "data-action":"resetCanvas"}).text("Reset"));
+
+    $drawingToolsDiv.find("a[data-action='resetCanvas']").on("click",  function(event) {
+        event.preventDefault();
         This.canvasLineDrawing.clearCanvas();
     });
 
-    var $outside = $("<div>", {id: "outsideWrapper" });
-    var $inside = $("<div>", {id: "insideWrapper", "style": "position:relative;" });
+    var $outside = $("<div>");
+    var $inside = $("<div>", {id: this.canvasWrapperDivId, "style": "position:relative;" });
 
     $outside.append($inside);
     $drawingToolsDiv.append($outside);
@@ -103,30 +115,31 @@ ImageAnnotation.prototype.drawCanvases = function(canvas) {
     this.removeCanvases();
 
     //'<img id="loadedImage" class="coveredImage">' +
-    canvas.id = "coveredCanvas";
+    canvas.id = this.coveredCanvasId;
     canvas.style= "position:absolute;top:0px;left:0px;z-index:1;";
 
-    var $insideWrapper = $(this.config.imageAnnotationContainerId).find('#insideWrapper');
+    var $insideWrapper = $("#"+this.canvasWrapperDivId);
 
     $insideWrapper.append(canvas);
 
-    var coverCanvas = $("<canvas id='coverCanvas'>")
+    var coverCanvas = $("<canvas>")
         .attr({
             width: canvas.width,
             height: canvas.height,
-            style: "position:relative;z-index:20;"
+            style: "position:relative;z-index:20;",
+            id: this.coveringCanvasId
         });
 
     $insideWrapper.append(coverCanvas);
 
     this.canvasLineDrawing.attachToCanvas(coverCanvas.get(0));
 
-    $(this.config.imageAnnotationContainerId).find('#annotationDrawingTools').show();
+    $('#'+this.annotationDrawingToolsDivId).show();
 };
 
 ImageAnnotation.prototype.removeCanvases = function() {
-    $(this.config.imageAnnotationContainerId).find("#coveredCanvas").remove(); // replace the canvas if it exists ...
-    $(this.config.imageAnnotationContainerId).find("#coverCanvas").remove(); // replace the canvas if it exists ...
+    $("#"+this.coveredCanvasId).remove(); // replace the canvas if it exists ...
+    $("#"+this.coveringCanvasId).remove(); // replace the canvas if it exists ...
 };
 
 ImageAnnotation.prototype.handleFileSelection = function(file) {
@@ -155,7 +168,7 @@ ImageAnnotation.prototype.rotateCanvases = function(degrees){
 
     var ctx=canvas.getContext("2d");
 
-    var coveredCanvas =  $(this.config.imageAnnotationContainerId).find("#coveredCanvas")[0];
+    var coveredCanvas =  $("#"+this.coveredCanvasId)[0];
 
     if(degrees == 90 || degrees == 270) {
         canvas.width = coveredCanvas.height;
@@ -180,7 +193,7 @@ ImageAnnotation.prototype.rotateCanvases = function(degrees){
 };
 
 ImageAnnotation.prototype.getAnnotatedCanvas = function(degrees){
-    var coveredCanvas = $(this.config.imageAnnotationContainerId).find("#coveredCanvas")[0];
+    var coveredCanvas = $("#"+this.coveredCanvasId)[0];
 
     var canvas = $("<canvas>").attr({
         width: coveredCanvas.width,
@@ -191,9 +204,20 @@ ImageAnnotation.prototype.getAnnotatedCanvas = function(degrees){
 
     context.drawImage(coveredCanvas, 0, 0);
 
-    var coverCanvas = $(this.config.imageAnnotationContainerId).find("#coverCanvas")[0];
+    var coverCanvas = $("#"+this.coveringCanvasId)[0];
 
     context.drawImage(coverCanvas, 0, 0);
 
     return canvas;
+};
+
+ImageAnnotation.prototype.elementGUID = function() {
+    return this.randomString() + this.randomString() + '-' + this.randomString() + '-' + this.randomString(); // + '-' +
+       // randomString() + '-' + randomString() + randomString() + randomString();
+};
+
+ImageAnnotation.prototype.randomString = function(){
+    return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
 };
