@@ -6,12 +6,12 @@
 */
 
 
-var LineDrawing = function(config) {
+var CanvasLineDrawing = function(config) {
     this.setConfig(config);
 };
 
 
-LineDrawing.prototype.setConfig = function(customConfig) {
+CanvasLineDrawing.prototype.setConfig = function(customConfig) {
 
     this.config = customConfig;
 
@@ -25,7 +25,7 @@ LineDrawing.prototype.setConfig = function(customConfig) {
 };
 
 
-LineDrawing.prototype.attachToCanvas = function(canvas) {
+CanvasLineDrawing.prototype.attachToCanvas = function(canvas) {
     this.canvas = canvas;
     this.canvasContext = canvas.getContext("2d");
     this.canvasContext.strokeStyle = this.config.strokeStyle;
@@ -87,7 +87,7 @@ LineDrawing.prototype.attachToCanvas = function(canvas) {
 };
 
 // Get the position of the mouse relative to the canvas
-LineDrawing.prototype.getMousePos = function(mouseEvent) {
+CanvasLineDrawing.prototype.getMousePos = function(mouseEvent) {
     var rect = this.canvas.getBoundingClientRect();
  //   var rect = this.getCanvasPosition();
     return {
@@ -97,7 +97,7 @@ LineDrawing.prototype.getMousePos = function(mouseEvent) {
 };
 
 // Draw to the canvas
-LineDrawing.prototype.renderCanvas = function() {
+CanvasLineDrawing.prototype.renderCanvas = function() {
     if (this.drawing) {
         this.canvasContext.moveTo(this.lastPos.x, this.lastPos.y);
         this.canvasContext.lineTo(this.mousePos.x, this.mousePos.y);
@@ -107,7 +107,7 @@ LineDrawing.prototype.renderCanvas = function() {
 };
 
 // Get the position of a touch relative to the canvas
-LineDrawing.prototype.getTouchPos = function(touchEvent) {
+CanvasLineDrawing.prototype.getTouchPos = function(touchEvent) {
 //    var rect = this.canvas.getBoundingClientRect();
 
    // var rect = this.getCanvasPosition();
@@ -119,7 +119,7 @@ LineDrawing.prototype.getTouchPos = function(touchEvent) {
 
 
 
-LineDrawing.prototype.getCanvasPosition = function() {
+CanvasLineDrawing.prototype.getCanvasPosition = function() {
     var xPosition = 0;
     var yPosition = 0;
 
@@ -136,17 +136,17 @@ LineDrawing.prototype.getCanvasPosition = function() {
     };
 };
 
-LineDrawing.prototype.setColor = function(colour) {
+CanvasLineDrawing.prototype.setColor = function(colour) {
     this.config.strokeStyle = colour;
     this.canvasContext.strokeStyle = this.config.strokeStyle;
 };
 
-LineDrawing.prototype.setLineWidth = function(lineWidth) {
+CanvasLineDrawing.prototype.setLineWidth = function(lineWidth) {
     this.config.lineWidth = lineWidth;
     this.canvasContext.lineWidth = this.config.lineWidth;
 };
 
-LineDrawing.prototype.clearCanvas = function() {
+CanvasLineDrawing.prototype.clearCanvas = function() {
     this.canvasContext.clearRect(0,0,this.canvas.width,this.canvas.height);
 };
 
