@@ -27,6 +27,14 @@ ImageAnnotation.prototype.setConfig = function(customConfig) {
         this.config.lineWidth = 2;
     }
 
+    if ((!this.config.maxImageWidth)|| (this.config.maxImageWidth<640) ) {
+        this.config.maxImageWidth = 1024;
+    }
+
+    if ((!this.config.imageQuality)|| (this.config.imageQuality < 0.5) ) {
+        this.config.imageQuality = 0.75;
+    }
+
     this.canvasLineDrawing = new CanvasLineDrawing({strokeStyle: this.config.strokeStyle,lineWidth: this.config.lineWidth});
 
 
@@ -37,13 +45,13 @@ ImageAnnotation.prototype.createElements = function() {
     // image rotation
     var $container = $(this.config.imageAnnotationContainerId);
 
-    var $drawingToolsDiv = $("<div>", {id: "annotationDrawingTools", "class": "a"});
+    var $drawingToolsDiv = $("<div>", {id: "annotationDrawingTools"});
 
     $container.append($drawingToolsDiv);
     $('#annotationDrawingTools').hide();
 
-    var $rotClockwise = $("<button>", {id: "clockwise", "class": "a"}).text("Rotate Right");
-    var $rotCounterClockwise = $("<button>", {id: "counterclockwise", "class": "a"}).text("Rotate Left");
+    var $rotClockwise = $("<button>", {id: "clockwise"}).text("Rotate Right");
+    var $rotCounterClockwise = $("<button>", {id: "counterclockwise"}).text("Rotate Left");
 
     $drawingToolsDiv.append($rotCounterClockwise);
     $drawingToolsDiv.append($rotClockwise);
@@ -126,8 +134,8 @@ ImageAnnotation.prototype.handleFileSelection = function(file) {
     this.removeCanvases();
 
     var resizer = new ImageResizer({
-        maxWidth: 1024,
-        quality: 0.90,
+        maxWidth: this.config.maxImageWidth,
+        quality: this.config.imageQuality,
         //timeout: 5000,
         debug : true
     });
